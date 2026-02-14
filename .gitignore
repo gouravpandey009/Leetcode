@@ -1,0 +1,28 @@
+# Node modules
+node_modules/
+
+# Env files (secrets)
+.env
+.env.local
+
+# Logs
+*.log
+
+# Build folders
+dist/
+build/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+
+# Go
+bin/
