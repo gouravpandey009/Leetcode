@@ -26,3 +26,6 @@ __pycache__/
 
 # Go
 bin/
+.,
+# C++
+*.exe
