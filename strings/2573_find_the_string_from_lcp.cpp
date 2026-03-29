@@ -81,7 +81,7 @@ int main() {
     int n;
     cout << "Enter size n: ";
     cin >> n;
-
+    
     vector<vector<int>> lcp(n, vector<int>(n));
 
     cout << "Enter LCP matrix:\n";
