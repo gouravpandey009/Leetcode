@@ -9,12 +9,13 @@ class Solution {
 public:
     long long maxTotalValue(vector<int>& nums, int k) {
         int n = nums.size();
-        if (n == 0) return 0; =
+        if (n == 0) return 0; 
 
         int LOG = 32 - __builtin_clz(n);
 
         vector<vector<int>> mx(n, vector<int>(LOG));
         vector<vector<int>> mn(n, vector<int>(LOG));
+
 
         for (int i = 0; i < n; i++) {
             mx[i][0] = nums[i];
@@ -57,7 +58,6 @@ public:
 
         long long answer = 0;
 
-        
         while (k-- > 0 && !pq.empty()) {
             auto cur = pq.top();
             pq.pop();
@@ -78,15 +78,14 @@ public:
 int main() {
     Solution solver;
 
+  
     vector<int> nums1 = {1, 5, 2, 4, 3};
     int k1 = 3;
-    long long result1 = solver.maxTotalValue(nums1, k1);
-    cout << "Test Case 1 Result: " << result1 << endl;
-    
+    cout << "Test Case 1 Result: " << solver.maxTotalValue(nums1, k1) << endl;
+
     vector<int> nums2 = {10, 2, 11, 3};
     int k2 = 2;
-    long long result2 = solver.maxTotalValue(nums2, k2);
-    cout << "Test Case 2 Result: " << result2 << endl;
+    cout << "Test Case 2 Result: " << solver.maxTotalValue(nums2, k2) << endl;
 
     return 0;
 }
