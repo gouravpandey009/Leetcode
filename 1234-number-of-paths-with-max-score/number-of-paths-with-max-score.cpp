@@ -1,78 +1,52 @@
 class Solution {
 public:
     vector<int> pathsWithMaxScore(vector<string>& board) {
-        int mod = 1e9 + 7;
+        const int MOD = 1e9 + 7;
         int n = board.size();
 
-    
-        vector<vector<int>> maxScore(n, vector<int>(n, -1));
+        vector<vector<int>> dp(n, vector<int>(n, -1));
         vector<vector<int>> ways(n, vector<int>(n, 0));
 
-
-        maxScore[n - 1][n - 1] = 0;
+        dp[n - 1][n - 1] = 0;
         ways[n - 1][n - 1] = 1;
 
-        for (int i = n - 1; i >= 0; i--) {
-            for (int j = n - 1; j >= 0; j--) {
-                if (board[i][j] == 'X') {
+        for (int i = n - 1; i >= 0; --i) {
+            for (int j = n - 1; j >= 0; --j) {
+                if (board[i][j] == 'X' || (i == n - 1 && j == n - 1))
                     continue;
-                }
-                if (i == n - 1 && j == n - 1) {
-                    continue;
-                }
 
-                int bestScore = -1;
-                long long totalWays = 0;
+                int best = -1;
+                long long cnt = 0;
 
-                // 1. Check Down
-                if (i + 1 < n && maxScore[i + 1][j] != -1) {
-                    if (maxScore[i + 1][j] > bestScore) {
-                        bestScore = maxScore[i + 1][j];
-                        totalWays = ways[i + 1][j];
-                    } else if (maxScore[i + 1][j] == bestScore) {
-                        totalWays = (totalWays + ways[i + 1][j]) % mod;
+                vector<pair<int,int>> nxt = {
+                    {i + 1, j},
+                    {i, j + 1},
+                    {i + 1, j + 1}
+                };
+
+                for (auto [x, y] : nxt) {
+                    if (x >= n || y >= n || dp[x][y] == -1) continue;
+
+                    if (dp[x][y] > best) {
+                        best = dp[x][y];
+                        cnt = ways[x][y];
+                    } else if (dp[x][y] == best) {
+                        cnt = (cnt + ways[x][y]) % MOD;
                     }
                 }
 
-                // 2. Check Down-Right
-                if (i + 1 < n && j + 1 < n && maxScore[i + 1][j + 1] != -1) {
-                    if (maxScore[i + 1][j + 1] > bestScore) {
-                        bestScore = maxScore[i + 1][j + 1];
-                        totalWays = ways[i + 1][j + 1];
-                    } else if (maxScore[i + 1][j + 1] == bestScore) {
-                        totalWays = (totalWays + ways[i + 1][j + 1]) % mod;
-                    }
-                }
+                if (best == -1) continue;
 
-                // 3. ADDED: Check Right (Missing in original code)
-                if (j + 1 < n && maxScore[i][j + 1] != -1) {
-                    if (maxScore[i][j + 1] > bestScore) {
-                        bestScore = maxScore[i][j + 1];
-                        totalWays = ways[i][j + 1];
-                    } else if (maxScore[i][j + 1] == bestScore) {
-                        totalWays = (totalWays + ways[i][j + 1]) % mod;
-                    }
-                }
+                int val = 0;
+                if (isdigit(board[i][j]))
+                    val = board[i][j] - '0';
 
-                // If no valid path reaches this square, leave it as -1
-                if (bestScore == -1) {
-                    continue;
-                }
-
-                int curr = 0;
-                if (board[i][j] >= '1' && board[i][j] <= '9') {
-                    curr = board[i][j] - '0';
-                }
-
-                maxScore[i][j] = (bestScore + curr) % mod;
-                ways[i][j] = totalWays % mod;
+                dp[i][j] = best + val;
+                ways[i][j] = cnt % MOD;
             }
         }
 
-        if (maxScore[0][0] == -1) {
-            return {0, 0};
-        }
-
-        return {maxScore[0][0], ways[0][0]};
+        if (dp[0][0] == -1) return {0, 0};
+        return {dp[0][0], ways[0][0]};
     }
 };
