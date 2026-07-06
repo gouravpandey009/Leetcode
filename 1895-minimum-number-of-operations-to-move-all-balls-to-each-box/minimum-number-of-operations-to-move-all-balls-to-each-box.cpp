@@ -1,21 +1,38 @@
 class Solution {
 public:
     vector<int> minOperations(string boxes) {
+        
         int n = boxes.size();
+        vector<int>answer(n , 0);
 
-        vector<int> answer(n);
+        int leftBalls = 0;
+        int leftCost = 0;
 
-        for(int target = 0 ; target < n ; target++){
-            int operations = 0;
+        for(int index = 0 ; index < n ; index++){
+            answer[index] += leftCost;
 
-            for(int current = 0 ; current < n; current++)
+            if(boxes[index] == '1')
             {
-                if(boxes[current] == '1'){
-                    operations += abs(target - current);
-                }
+                leftBalls++;
             }
 
-            answer[target] = operations;
+            leftCost += leftBalls;
+            
+        }
+
+
+        int rightBalls = 0;
+        int rightCost = 0;
+
+        for(int index = n - 1 ; index >= 0 ; index--){
+            answer[index] += rightCost;
+
+            if(boxes[index] == '1')
+            {
+                rightBalls++;
+            }
+
+            rightCost += rightBalls;
         }
 
         return answer;
