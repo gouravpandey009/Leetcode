@@ -1,68 +1,57 @@
-#include <vector>
-#include <string>
-
-using namespace std;
-
 class Solution {
 public:
-    static constexpr int MOD = 1e9 + 7;
-
-    struct Node {
-        int v, c;
-    };
-
     vector<int> sumAndMultiply(string s, vector<vector<int>>& queries) {
+        const int MOD = 1e9 + 7;
         int n = s.size();
 
-        vector<int> p(n + 1, 1), pre(n + 1, 0);
-        for(int i = 1; i <= n; i++) {
-            p[i] = 1LL * p[i - 1] * 10 % MOD;
-        }
-        for(int i = 0; i < n; i++) {
-            pre[i + 1] = pre[i] + (s[i] - '0');
+        vector<int> prefSum(n + 1, 0);
+
+        for (int i = 0; i < n; i++)
+            prefSum[i + 1] = prefSum[i] + (s[i] - '0');
+
+        vector<int> pos, digit;
+        for (int i = 0; i < n; i++) {
+            if (s[i] != '0') {
+                pos.push_back(i);
+                digit.push_back(s[i] - '0');
+            }
         }
 
-        vector<Node> st(2 * n);
-        for(int i = 0; i < n; i++){
-            st[n + i] = (s[i] == '0') ? Node{0, 0} : Node{s[i] - '0', 1};
-        }
+        int m = digit.size();
 
-        
-        auto merge = [&](const Node& a, const Node& b) {
-            return Node{
-                (int)((1LL * a.v * p[b.c] + b.v) % MOD),
-                a.c + b.c
-            }; 
-        };
+        vector<long long> pw(m + 1, 1);
+        for (int i = 1; i <= m; i++)
+            pw[i] = pw[i - 1] * 10 % MOD;
 
-        for(int i = n - 1; i > 0; --i){
-            st[i] = merge(st[i << 1], st[i << 1 | 1]);
-        } 
+        vector<long long> pref(m + 1, 0);
+        for (int i = 0; i < m; i++)
+            pref[i + 1] = (pref[i] * 10 + digit[i]) % MOD;
 
         vector<int> ans;
-        ans.reserve(queries.size());
 
-        for(auto& q : queries){
-           
-            int l = q[0] + n, r = q[1] + n; 
+        for (auto &q : queries) {
+            int l = q[0], r = q[1];
 
-            Node L {0, 0}, R {0, 0};
+            long long sum = prefSum[r + 1] - prefSum[l];
 
-            while(l <= r){ 
-                if(l & 1) L = merge(L, st[l++]);
-                if(!(r & 1)) R = merge(st[r--], R);
-                l >>= 1;
-                r >>= 1;
+            auto it1 = lower_bound(pos.begin(), pos.end(), l);
+            auto it2 = upper_bound(pos.begin(), pos.end(), r);
+
+            if (it1 == it2) {
+                ans.push_back(0);
+                continue;
             }
 
-            Node x = merge(L, R);
+            int L = it1 - pos.begin();
+            int R = int(it2 - pos.begin()) - 1;
+            int len = R - L + 1;
 
-            
-            long long range_sum = pre[q[1] + 1] - pre[q[0]];
+            long long val = (pref[R + 1] - pref[L] * pw[len]) % MOD;
+            if (val < 0) val += MOD;
 
-            ans.push_back(1LL * x.v * range_sum % MOD); 
+            ans.push_back(val * sum % MOD);
         }
-        
+
         return ans;
     }
 };
