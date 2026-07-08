@@ -4,62 +4,49 @@ public:
 
     vector<int> sumAndMultiply(string s, vector<vector<int>>& queries) {
 
-        const int n = s.size();
+        int n = s.size();
 
         vector<int> prefSum(n + 1);
 
-        for (int i = 0; i < n; i++)
+        int nz = 0;
+
+        for (int i = 0; i < n; i++) {
             prefSum[i + 1] = prefSum[i] + (s[i] - '0');
+            if (s[i] != '0') nz++;
+        }
 
-        vector<int> id(n, -1);
-
-        int m = 0;
-        for (char c : s)
-            if (c != '0')
-                m++;
-
-        vector<int> hash(m + 1);
-        vector<int> pw(m + 1);
+        vector<int> hash(nz + 1);
+        vector<int> pw(nz + 1);
 
         pw[0] = 1;
 
-        int k = 0;
+        vector<int> next(n);
+        vector<int> prev(n);
+
+        int id = 0;
 
         for (int i = 0; i < n; i++) {
-
-            if (s[i] == '0')
-                continue;
-
-            id[i] = k;
-
-            hash[k + 1] = (10LL * hash[k] + (s[i] - '0')) % MOD;
-
-            pw[k + 1] = (10LL * pw[k]) % MOD;
-
-            k++;
+            if (s[i] != '0') {
+                hash[id + 1] = (10LL * hash[id] + (s[i] - '0')) % MOD;
+                pw[id + 1] = (10LL * pw[id]) % MOD;
+                prev[i] = id++;
+            } else {
+                prev[i] = -1;
+            }
         }
 
-        vector<int> nextId(n);
-        vector<int> prevId(n);
+        int last = -1;
+        for (int i = 0; i < n; i++) {
+            if (prev[i] != -1) last = prev[i];
+            prev[i] = last;
+        }
 
-        int cur = -1;
+        last = -1;
+        id = nz - 1;
 
         for (int i = n - 1; i >= 0; i--) {
-
-            if (id[i] != -1)
-                cur = id[i];
-
-            nextId[i] = cur;
-        }
-
-        cur = -1;
-
-        for (int i = 0; i < n; i++) {
-
-            if (id[i] != -1)
-                cur = id[i];
-
-            prevId[i] = cur;
+            if (s[i] != '0') last = id--;
+            next[i] = last;
         }
 
         vector<int> ans(queries.size());
@@ -69,8 +56,8 @@ public:
             int l = queries[i][0];
             int r = queries[i][1];
 
-            int L = nextId[l];
-            int R = prevId[r];
+            int L = next[l];
+            int R = prev[r];
 
             if (L == -1 || R == -1 || L > R) {
                 ans[i] = 0;
@@ -79,14 +66,11 @@ public:
 
             int sum = prefSum[r + 1] - prefSum[l];
 
-            long long val =
-                hash[R + 1] -
-                1LL * hash[L] * pw[R - L + 1] % MOD;
+            long long val = hash[R + 1];
+            val -= 1LL * hash[L] * pw[R - L + 1] % MOD;
+            if (val < 0) val += MOD;
 
-            if (val < 0)
-                val += MOD;
-
-            ans[i] = val * sum % MOD;
+            ans[i] = (int)(val * sum % MOD);
         }
 
         return ans;
