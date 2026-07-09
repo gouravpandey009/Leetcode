@@ -2,22 +2,23 @@ class Solution {
 public:
     vector<bool> pathExistenceQueries(int n, vector<int>& nums, int maxDiff, vector<vector<int>>& queries) {
 
+        vector<int> comp(n);
+        comp[0] = 0;
 
-        vector<int>component(n , 0);
-        int compNo = 0;
-        for(int i = 1 ; i <  n ; i++){
-            if(nums[i] - nums[i - 1] > maxDiff){
-                compNo++;
-            }
-            component[i] = compNo;
+        int id = 0;
+
+        for (int i = 1; i < n; i++) {
+            if (nums[i] - nums[i - 1] > maxDiff)
+                ++id;
+            comp[i] = id;
         }
 
-        vector<bool>s;
+        vector<bool> ans;
+        ans.reserve(queries.size());
 
-        for(auto &it : queries){
-            s.push_back(component[it[0]] == component[it[1]]);
-        }
+        for (const auto &q : queries)
+            ans.push_back(comp[q[0]] == comp[q[1]]);
 
-        return s;
+        return ans;
     }
 };
