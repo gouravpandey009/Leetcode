@@ -2,15 +2,16 @@ class Solution {
 public:
     int countCompleteComponents(int n, vector<vector<int>>& edges) {
 
-        vector<vector<int>> g(n);
+        vector<vector<int>> graph(n);
 
+        // Build the graph.
         for (auto &e : edges) {
-            g[e[0]].push_back(e[1]);
-            g[e[1]].push_back(e[0]);
+            graph[e[0]].push_back(e[1]);
+            graph[e[1]].push_back(e[0]);
         }
 
-        vector<int> vis(n);
-        int ans = 0;
+        vector<int> vis(n, 0);
+        int complete = 0;
 
         for (int i = 0; i < n; i++) {
 
@@ -29,9 +30,11 @@ public:
                 q.pop();
 
                 nodes++;
-                degreeSum += g[u].size();
 
-                for (int v : g[u]) {
+                // Every adjacent node contributes one degree.
+                degreeSum += graph[u].size();
+
+                for (int v : graph[u]) {
                     if (!vis[v]) {
                         vis[v] = 1;
                         q.push(v);
@@ -39,10 +42,13 @@ public:
                 }
             }
 
+            // Complete graph with k nodes has:
+            // k * (k - 1) / 2 edges.
+            // Degree sum counts every edge twice.
             if (degreeSum == nodes * (nodes - 1))
-                ans++;
+                complete++;
         }
 
-        return ans;
+        return complete;
     }
 };
