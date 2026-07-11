@@ -1,36 +1,48 @@
 class Solution {
 public:
     int countCompleteComponents(int n, vector<vector<int>>& edges) {
-        vector<vector<int>>graph(n);
-        unordered_map<string , int> componentFreq;
-        for(int vertex = 0 ; vertex < n ; vertex++){
-            graph[vertex].push_back(vertex);
+
+        vector<vector<int>> g(n);
+
+        for (auto &e : edges) {
+            g[e[0]].push_back(e[1]);
+            g[e[1]].push_back(e[0]);
         }
 
-        for(const auto& edge : edges){
-            graph[edge[0]].push_back(edge[1]);
-            graph[edge[1]].push_back(edge[0]);
-        }
+        vector<int> vis(n);
+        int ans = 0;
 
-        for(int vertex = 0 ; vertex < n ; vertex++){
-            vector<int> neighbors = graph[vertex];
-            sort(neighbors.begin()  , neighbors.end());
+        for (int i = 0; i < n; i++) {
 
-            string key;
-            for(int num : neighbors){
-                key += to_string(num) + " ,";
+            if (vis[i]) continue;
+
+            queue<int> q;
+            q.push(i);
+            vis[i] = 1;
+
+            int nodes = 0;
+            int degreeSum = 0;
+
+            while (!q.empty()) {
+
+                int u = q.front();
+                q.pop();
+
+                nodes++;
+                degreeSum += g[u].size();
+
+                for (int v : g[u]) {
+                    if (!vis[v]) {
+                        vis[v] = 1;
+                        q.push(v);
+                    }
+                }
             }
-            componentFreq[key]++;
+
+            if (degreeSum == nodes * (nodes - 1))
+                ans++;
         }
 
-        int completeCount = 0;
-        for(const auto& entry : componentFreq){
-            int size = count(entry.first.begin() , entry.first.end() , ',');
-            if(size == entry.second){
-                completeCount++;
-            }
-        }
-
-        return completeCount;
+        return ans;
     }
 };
