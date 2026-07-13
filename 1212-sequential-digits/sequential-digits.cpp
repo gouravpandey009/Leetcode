@@ -1,17 +1,24 @@
 class Solution {
 public:
     vector<int> sequentialDigits(int low, int high) {
-        vector<int>ans;
-        string s = "123456789";
-        string l = to_string(low);
-        string h = to_string(high);
 
-        for(int i = l.size() ; i <= h.size() ; i++){
-            for(int j = 0 ;  j <= 9 - i ; j++){
-                string n = s.substr(j , i);
-                int num = stoi(n);
-                if(num >= low && num <= high)
-                ans.push_back(num);
+        vector<int> ans;
+
+        // Try every possible length.
+        for (int len = 2; len <= 9; len++) {
+
+            // Starting digit.
+            for (int start = 1; start + len - 1 <= 9; start++) {
+
+                int num = 0;
+                int digit = start;
+
+                // Build the sequential number.
+                for (int k = 0; k < len; k++)
+                    num = num * 10 + digit++;
+
+                if (num >= low && num <= high)
+                    ans.push_back(num);
             }
         }
 
