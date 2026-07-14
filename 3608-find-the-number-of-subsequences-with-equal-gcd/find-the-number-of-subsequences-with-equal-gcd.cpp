@@ -1,34 +1,56 @@
 class Solution {
-    const int mod = 1e9 + 7;
-    // dp[index][gcd1][gcd2]
-    int dp[200][201][201];
-
 public:
-    int solve(int i, vector<int> &nums, int first, int second) {
-        // Base case: reached the end of the array
-        if (i == nums.size()) {
-            // Both subsets must be non-empty (GCD > 0) and have equal GCDs
-            return (first > 0 && second > 0 && first == second) ? 1 : 0;
-        }
-
-        if (dp[i][first][second] != -1) return dp[i][first][second];
-
-        // Option 1: Skip the current element entirely
-        int skip = solve(i + 1, nums, first, second);
-        
-        // Option 2: Include the current element into the first subsequence
-        int take1 = solve(i + 1, nums, std::gcd(first, nums[i]), second);
-
-        // Option 3: Include the current element into the second subsequence
-        int take2 = solve(i + 1, nums, first, std::gcd(second, nums[i]));
-        
-        // Sum up all valid ways and store in DP table
-        return dp[i][first][second] = (0LL + skip + take1 + take2) % mod;
-    }
+    static constexpr int MAX = 200;
+    static constexpr int MOD = 1000000007;
 
     int subsequencePairCount(vector<int>& nums) {
-        // Initialize the DP array with -1
-        memset(dp, -1, sizeof(dp));
-        return solve(0, nums, 0, 0);
+
+        static int dp[MAX + 1][MAX + 1];
+        static int ndp[MAX + 1][MAX + 1];
+
+        memset(dp, 0, sizeof(dp));
+        dp[0][0] = 1;
+
+        for (int x : nums) {
+
+            memset(ndp, 0, sizeof(ndp));
+
+            for (int g1 = 0; g1 <= MAX; g1++) {
+                for (int g2 = 0; g2 <= MAX; g2++) {
+
+                    int cur = dp[g1][g2];
+                    if (!cur) continue;
+
+                    // Don't use x.
+                    ndp[g1][g2] += cur;
+                    if (ndp[g1][g2] >= MOD)
+                        ndp[g1][g2] -= MOD;
+
+                    // Put x into seq1.
+                    int ng1 = (g1 == 0 ? x : std::gcd(g1, x));
+
+                    ndp[ng1][g2] += cur;
+                    if (ndp[ng1][g2] >= MOD)
+                        ndp[ng1][g2] -= MOD;
+
+                    // Put x into seq2.
+                    int ng2 = (g2 == 0 ? x : std::gcd(g2, x));
+
+                    ndp[g1][ng2] += cur;
+                    if (ndp[g1][ng2] >= MOD)
+                        ndp[g1][ng2] -= MOD;
+                }
+            }
+
+            memcpy(dp, ndp, sizeof(dp));
+        }
+
+        long long ans = 0;
+
+        for (int g = 1; g <= MAX; g++) {
+            ans += dp[g][g];
+        }
+
+        return ans % MOD;
     }
 };
