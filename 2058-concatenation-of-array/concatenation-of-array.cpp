@@ -8,11 +8,11 @@ public:
 
         for(int i = 0 ; i < n ; i++){
             answer[i] = nums[i];
+
+             answer[i + n] = nums[i];
         }
 
-        for(int i = 0 ; i < n ;i++){
-            answer[i + n] = nums[i];
-        }
+
 
         return answer;
     }
