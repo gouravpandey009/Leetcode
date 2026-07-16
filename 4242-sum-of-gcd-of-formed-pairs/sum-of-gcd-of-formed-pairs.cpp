@@ -1,19 +1,35 @@
 class Solution {
 public:
-    long long gcdSum(vector<int>& A) {
-        int max = 0;
+    long long gcdSum(vector<int>& nums) {
 
-        for(int& n : A){
-            max = ::max(max ,n);
-            n = gcd(n ,max);
+        int n = nums.size();
+        vector<int> prefixGcd(n);
+
+        int mx = 0;
+
+        for (int i = 0; i < n; i++) {
+
+            // Current prefix maximum.
+            mx = max(mx, nums[i]);
+
+            // gcd(nums[i], prefix maximum).
+            prefixGcd[i] = gcd(nums[i], mx);
         }
 
-        ranges::sort(A);
+        sort(prefixGcd.begin(), prefixGcd.end());
 
-        long long res = 0;
-        for(int i = 0 , j = A.size() - 1; i < j ; i++,j--)
-        res += gcd(A[i] , A[j]);
-        
-        return res;
+        long long ans = 0;
+
+        int l = 0;
+        int r = n - 1;
+
+        // Pair smallest with largest.
+        while (l < r) {
+            ans += gcd(prefixGcd[l], prefixGcd[r]);
+            l++;
+            r--;
+        }
+
+        return ans;
     }
 };
