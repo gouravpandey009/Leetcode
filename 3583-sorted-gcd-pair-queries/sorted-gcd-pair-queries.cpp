@@ -1,45 +1,53 @@
-class Solution{
+class Solution {
 public:
-    vector<int> gcdValues(vector<int>& v, vector<long long>& q){
-        int n = v.size();
-        int maxx = *max_element(v.begin(), v.end());
-        vector<int> cntDivisors(maxx + 1, 0);
-        for(auto x : v){
-            for(int i = 1; i * i <= x; i++){
-                if(x % i == 0){
-                    cntDivisors[i]++;
-                    if(i != x / i){
-                        cntDivisors[x / i]++;
-                    }
-                }
-            }
+    vector<int> gcdValues(vector<int>& nums, vector<long long>& queries) {
+
+        int mx = *max_element(nums.begin(), nums.end());
+
+        vector<int> freq(mx + 1);
+
+        // Frequency of every value.
+        for (int x : nums)
+            freq[x]++;
+
+        vector<long long> exact(mx + 1);
+
+        // Inclusion-Exclusion over divisors.
+        for (int g = mx; g >= 1; g--) {
+
+            long long cnt = 0;
+
+            // Count numbers divisible by g.
+            for (int x = g; x <= mx; x += g)
+                cnt += freq[x];
+
+            // Total pairs divisible by g.
+            exact[g] = cnt * (cnt - 1) / 2;
+
+            // Remove pairs whose gcd is a larger multiple.
+            for (int x = g + g; x <= mx; x += g)
+                exact[g] -= exact[x];
         }
-        vector<long long int> gcdCount(maxx + 1, 0);
-        for(int g = maxx; g >= 1; g--){
-            long long int count = cntDivisors[g];
-            gcdCount[g] = 1ll * count *(count - 1) / 2;
-            for(int mult = 2 * g; mult <= maxx; mult += g){
-                gcdCount[g] -= gcdCount[mult];
-            }
-        }
-        
-        vector<long long int> pref(maxx + 1, 0);
-        for(int g = 1; g <= maxx; g++){
-            pref[g] = pref[g - 1] + gcdCount[g];
-        }
+
+        // Prefix over gcd values.
+        vector<long long> pref(mx + 1);
+
+        for (int g = 1; g <= mx; g++)
+            pref[g] = pref[g - 1] + exact[g];
+
         vector<int> ans;
-        for(auto q : q){
-            long long int left = 1, right = maxx, answer = -1;
-            while(left <= right){
-                long long int mid =(left + right) / 2;
-                if(pref[mid] > q){
-                    answer = mid;
-                    right = mid - 1;
-                } else{
-                    left = mid + 1;
-                }
-            }
-            ans.push_back(answer);
+        ans.reserve(queries.size());
+
+        for (long long q : queries) {
+
+            // Queries are 0-indexed.
+            q++;
+
+            int g = lower_bound(pref.begin() + 1,
+                                pref.end(),
+                                q) - pref.begin();
+
+            ans.push_back(g);
         }
 
         return ans;
