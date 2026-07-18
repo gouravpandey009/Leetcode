@@ -2,22 +2,25 @@ class Solution {
 public:
     vector<int> smallerNumbersThanCurrent(vector<int>& nums) {
 
-        vector<int> sorted = nums;
+        vector<int> frequency(101, 0);
 
-        sort(sorted.begin(), sorted.end());
+        // Count frequency of every value
+        for (int number : nums)
+            frequency[number]++;
 
-        unordered_map<int, int> firstIndex;
-
-        for (int i = 0; i < sorted.size(); i++) {
-
-            if (!firstIndex.count(sorted[i]))
-                firstIndex[sorted[i]] = i;
-        }
+        // Prefix sum
+        for (int i = 1; i <= 100; i++)
+            frequency[i] += frequency[i - 1];
 
         vector<int> answer;
 
-        for (int x : nums)
-            answer.push_back(firstIndex[x]);
+        for (int number : nums) {
+
+            if (number == 0)
+                answer.push_back(0);
+            else
+                answer.push_back(frequency[number - 1]);
+        }
 
         return answer;
     }
