@@ -1,31 +1,37 @@
 class Solution {
 public:
     string smallestSubsequence(string s) {
-        vector<int> last(26);
-        vector<bool> visited(26 , false);
 
-        for(int i = 0 ; i < s.size() ; i++){
-            last[s[i] - 'a'] = i;
-        }
+        vector<int> freq(26, 0);
+        vector<bool> vis(26, false);
 
-        string ans;
+        for (char c : s)
+            freq[c - 'a']++;
 
-        for(int i = 0 ; i < s.size() ; i++){
-            char ch = s[i];
+        string st;
 
-            if(visited[ch - 'a']) continue;
+        for (char c : s) {
 
-            while(!ans.empty() && ans.back() > ch && last[ans.back() - 'a'] > i){
-                visited[ans.back() - 'a'] = false;
-                ans.pop_back();
+            // One occurrence has been processed.
+            freq[c - 'a']--;
+
+            // Already included.
+            if (vis[c - 'a'])
+                continue;
+
+            // Remove bigger characters if they appear later.
+            while (!st.empty() &&
+                   st.back() > c &&
+                   freq[st.back() - 'a'] > 0) {
+
+                vis[st.back() - 'a'] = false;
+                st.pop_back();
             }
 
-            ans.push_back(ch);
-            visited[ch - 'a'] = true;
+            st.push_back(c);
+            vis[c - 'a'] = true;
         }
 
-        return ans;
-
-
+        return st;
     }
 };
