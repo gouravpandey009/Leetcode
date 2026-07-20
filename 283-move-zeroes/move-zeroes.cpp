@@ -2,19 +2,21 @@ class Solution {
 public:
     void moveZeroes(vector<int>& nums) {
 
-        vector<int> temp;
+        // Position where the next non-zero element should be placed
+        int write = 0;
 
-        // Store all non-zero elements
-        for (int num : nums) {
-            if (num != 0)
-                temp.push_back(num);
+        // Scan the entire array
+        for (int read = 0; read < nums.size(); read++) {
+
+            // Found a non-zero element
+            if (nums[read] != 0) {
+
+                // Move it to its correct position
+                swap(nums[write], nums[read]);
+
+                // Next position for a non-zero
+                write++;
+            }
         }
-
-        // Add zeroes
-        while (temp.size() < nums.size())
-            temp.push_back(0);
-
-        // Copy back
-        nums = temp;
     }
 };
