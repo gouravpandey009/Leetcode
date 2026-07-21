@@ -1,30 +1,38 @@
 class Solution {
 public:
     int maxActiveSectionsAfterTrade(string s) {
-        string t = "1" + s + "1";
-        int n = t.size();
 
-        vector<pair<char,int>> blocks;
-        int i = 0;
-        while (i < n) {
-            char c = t[i];
-            int j = i;
-            while (j < n && t[j] == c) j++;
-            blocks.push_back({c, j - i});
+        int n = s.size();
+
+        int ones = 0;
+        int best = 0;
+
+        int prevZero = INT_MIN;
+
+        for (int i = 0; i < n; ) {
+
+            int j = i + 1;
+
+            while (j < n && s[j] == s[i])
+                ++j;
+
+            int len = j - i;
+
+            if (s[i] == '1') {
+
+                // Count existing active sections.
+                ones += len;
+
+            } else {
+
+                // Merge two neighboring zero blocks.
+                best = max(best, prevZero + len);
+                prevZero = len;
+            }
+
             i = j;
         }
 
-        int ones = count(s.begin(), s.end(), '1');
-        int maxGain = 0;
-
-        for (int k = 1; k + 1 < (int)blocks.size(); k++) {
-            if (blocks[k].first == '1' &&
-                blocks[k-1].first == '0' &&
-                blocks[k+1].first == '0') {
-                maxGain = max(maxGain, blocks[k-1].second + blocks[k+1].second);
-            }
-        }
-
-        return ones + maxGain;
+        return ones + best;
     }
 };
