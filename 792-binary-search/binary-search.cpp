@@ -1,22 +1,32 @@
 class Solution {
 public:
     int search(vector<int>& nums, int target) {
-        int n = nums.size() - 1;
-        int start = 0 , end = n , mid ;
 
-        while(start<=end){
-            mid = start+(end-start)/2;
+        int left = 0;
+        int right = (nums.size()) - 1;
 
-            if(nums[mid]==target){
+        while (left <= right) {
+
+            // Overflow-safe middle index.
+            int mid = left + (right - left) / 2;
+
+            // Target found.
+            if (nums[mid] == target) {
                 return mid;
             }
-            else if(nums[mid]<target){
-                start = mid+1;
+
+            // Target can only exist in the right half.
+            if (nums[mid] < target) {
+                left = mid + 1;
             }
-            else{
-                end = mid-1;
+
+            // Target can only exist in the left half.
+            else {
+                right = mid - 1;
             }
         }
+
+        // Search space became empty.
         return -1;
     }
 };
