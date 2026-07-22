@@ -1,58 +1,137 @@
+class SegmentTree {
+    int n;
+    vector<int> tree;
+
+    void build(int node, int l, int r, vector<int> &a) {
+        if (l == r) {
+            tree[node] = a[l];
+            return;
+        }
+
+        int mid = (l + r) >> 1;
+
+        build(node << 1, l, mid, a);
+        build(node << 1 | 1, mid + 1, r, a);
+
+        tree[node] = max(tree[node << 1], tree[node << 1 | 1]);
+    }
+
+    int query(int node, int l, int r, int ql, int qr) {
+
+        if (ql <= l && r <= qr)
+            return tree[node];
+
+        int mid = (l + r) >> 1;
+        int ans = 0;
+
+        if (ql <= mid)
+            ans = max(ans, query(node << 1, l, mid, ql, qr));
+
+        if (qr > mid)
+            ans = max(ans, query(node << 1 | 1, mid + 1, r, ql, qr));
+
+        return ans;
+    }
+
+public:
+
+    SegmentTree(vector<int> &a) {
+
+        n = a.size();
+        tree.assign(4 * max(1, n), 0);
+
+        if (n)
+            build(1, 0, n - 1, a);
+    }
+
+    int query(int l, int r) {
+
+        if (l > r || n == 0)
+            return 0;
+
+        return query(1, 0, n - 1, l, r);
+    }
+};
+
 class Solution {
 public:
     vector<int> maxActiveSectionsAfterTrade(string s, vector<vector<int>>& queries) {
+
+        int totalOne = count(s.begin(), s.end(), '1');
+
+        vector<int> zeroLen;
+        vector<int> left;
+        vector<int> right;
+
         int n = s.size();
-        int ones = ranges::count(s, '1');
 
-        // maximal zero-blocks (inclusive ends), split into starts / ends
-        vector<int> zs, ze;
         for (int i = 0; i < n; ) {
+
+            int j = i;
+
+            while (j < n && s[j] == s[i])
+                j++;
+
             if (s[i] == '0') {
-                int j = i;
-                while (j < n && s[j] == '0') ++j;
-                zs.push_back(i); ze.push_back(j - 1);
-                i = j;
-            } else ++i;
-        }
-        int nblocks = zs.size();
+                zeroLen.push_back(j - i);
+                left.push_back(i);
+                right.push_back(j - 1);
+            }
 
-        // valley j: full value = sum of the two adjacent block lengths
-        vector<int> V;
-        for (int j = 0; j + 1 < nblocks; ++j)
-            V.push_back((ze[j] - zs[j] + 1) + (ze[j + 1] - zs[j + 1] + 1));
-
-        // sparse table for range-max over V
-        int nv = V.size();
-        vector<vector<int>> sparse{V};
-        for (int half = 1; half * 2 <= nv; half *= 2) {
-            auto& prev = sparse.back();
-            vector<int> next;
-            next.reserve(prev.size() - half);
-            for (int i = 0; i + half < (int)prev.size(); ++i)
-                next.push_back(max(prev[i], prev[i + half]));
-            sparse.push_back(move(next));
+            i = j;
         }
 
-        auto rmq = [&](int lo, int hi) {              // inclusive max over V[lo..hi]
-            int t = bit_width(unsigned(hi - lo + 1)) - 1;
-            return max(sparse[t][lo], sparse[t][hi - (1 << t) + 1]);
-        };
+        int m = zeroLen.size();
 
-        auto clip = [&](int j, int l, int r) {        // valley j's gain, clipped to [l, r]
-            return V[j] - max(0, l - zs[j]) - max(0, ze[j + 1] - r);
-        };
+        if (m < 2)
+            return vector<int>(queries.size(), totalOne);
 
-        auto gain = [&](int l, int r) {
-            if (nblocks < 2) return 0;
-            int ja = ranges::lower_bound(ze, l) - ze.begin();     // first usable valley: left block ends >= l
-            int jb = ranges::upper_bound(zs, r) - zs.begin() - 2; // last  usable valley: right block starts <= r
-            if (ja > jb) return 0;
-            return max({clip(ja, l, r), clip(jb, l, r), jb - ja >= 2 ? rmq(ja + 1, jb - 1) : 0});
-        };
+        vector<int> gain(m - 1);
+
+        for (int i = 0; i < m - 1; i++)
+            gain[i] = zeroLen[i] + zeroLen[i + 1];
+
+        SegmentTree st(gain);
 
         vector<int> ans;
-        ans.reserve(queries.size());
-        for (auto& q : queries) ans.push_back(ones + gain(q[0], q[1]));
+
+        for (auto &q : queries) {
+
+            int l = q[0];
+            int r = q[1];
+
+            int first = lower_bound(right.begin(), right.end(), l) - right.begin();
+            int last  = upper_bound(left.begin(), left.end(), r) - left.begin() - 1;
+
+            // Less than two zero blocks.
+            if (first >= last || first >= m || last < 0) {
+                ans.push_back(totalOne);
+                continue;
+            }
+
+            int firstLen = right[first] - max(left[first], l) + 1;
+            int lastLen  = min(right[last], r) - left[last] + 1;
+
+            if (first + 1 == last) {
+
+                ans.push_back(totalOne + firstLen + lastLen);
+                continue;
+            }
+
+            int best = 0;
+
+            // First partial block.
+            best = max(best, firstLen + zeroLen[first + 1]);
+
+            // Last partial block.
+            best = max(best, zeroLen[last - 1] + lastLen);
+
+            // Completely inside.
+            best = max(best, st.query(first + 1, last - 2));
+
+            ans.push_back(totalOne + best);
+        }
+
         return ans;
     }
 };
