@@ -2,14 +2,18 @@ class Solution {
 public:
     int missingNumber(vector<int>& nums) {
         
-        sort(nums.begin() , nums.end());
+
+        unordered_set<int> seen;
 
 
-        for(int i = 0 ; i < nums.size() ; i++){
-            if(nums[i] != i)
-            return i;
-        }
+        for(int number : nums)
+            seen.insert(number);
 
-        return nums.size();
+            for(int number = 0 ; number <= nums.size() ; number++){
+                if(!seen.count(number))
+                return number;
+            }
+                
+        return -1;
     }
 };
