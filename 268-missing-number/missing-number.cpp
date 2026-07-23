@@ -2,24 +2,14 @@ class Solution {
 public:
     int missingNumber(vector<int>& nums) {
         
-        int n = nums.size();
-
-        for(int number = 0 ;  number <= n ; number++){
-            bool found = false;
+        sort(nums.begin() , nums.end());
 
 
-            for(int value : nums){
-                if(value == number){
-                    found  = true;
-
-                    break;
-                }
-            }
-
-            if(!found)
-            return number;
+        for(int i = 0 ; i < nums.size() ; i++){
+            if(nums[i] != i)
+            return i;
         }
 
-        return -1;
+        return nums.size();
     }
 };
