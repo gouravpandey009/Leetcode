@@ -7,6 +7,7 @@ public:
         int n = nums.size();
 
         // Three largest numbers.
+        
         int p1 = nums[n - 1] * nums[n - 2] * nums[n - 3];
 
         // Two smallest + largest.
