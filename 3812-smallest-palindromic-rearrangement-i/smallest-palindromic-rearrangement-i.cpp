@@ -1,21 +1,31 @@
 class Solution {
 public:
     string smallestPalindrome(string s) {
-        int n = s.size() , j = 0;
 
-        int freq[26]{};
+        vector<int> freq(26, 0);
 
+        for (char c : s)
+            freq[c - 'a']++;
 
-        for(int i = 0 ; i < n  >> 1; i++)
-            freq[(s[i] & 31) - 1]++;
+        string left;
+        char mid = 0;
 
-            for(int i = 0 ; i < 26 ; i++){
-                while(freq[i]--){
-                    s[j] = 'a' + i;
-                    s[n - 1 - j++] = 'a' + i;
-                }
-            }
+        for (int i = 0; i < 26; i++) {
 
-            return s;
+            // Left half gets half of the occurrences.
+            left.append(freq[i] / 2, char('a' + i));
+
+            // Odd frequency character goes to the middle.
+            if (freq[i] & 1)
+                mid = char('a' + i);
         }
+
+        string right = left;
+        reverse(right.begin(), right.end());
+
+        if (mid)
+            return left + string(1, mid) + right;
+
+        return left + right;
+    }
 };
