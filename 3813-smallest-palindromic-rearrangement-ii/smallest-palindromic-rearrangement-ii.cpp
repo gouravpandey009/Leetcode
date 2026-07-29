@@ -1,71 +1,93 @@
 class Solution {
-public:
-    const long long LIMIT = 1000000;
+private:
 
-    long long combCapped(long long n, long long r) {
-        if (r < 0 || r > n) return 0;
+    // Returns C(n, r), capped at k + 1.
+    long long comb(long long n, long long r, long long k) {
+
         r = min(r, n - r);
-        if (r == 0) return 1;
 
-        __int128 res = 1;
+        long long res = 1;
+
         for (long long i = 1; i <= r; i++) {
-            res = res * (n - r + i) / i;
-            if (res > LIMIT) return LIMIT + 1; 
+
+            res = res * (n - i + 1) / i;
+
+            if (res > k)
+                return k + 1;
         }
-        return (long long)res;
+
+        return res;
     }
 
-    long long countWays(vector<int>& cnt) {
-        long long remaining = 0;
-        for (int x : cnt) remaining += x;
+public:
 
-        long long ans = 1;
-        for (int c : cnt) {
-            if (c == 0) continue;
-            long long part = combCapped(remaining, c);
-            ans *= part;
-            if (ans > LIMIT) return LIMIT + 1;
-            remaining -= c;
-        }
-        return ans;
-    }
+    string smallestPalindrome(string s, long long k) {
 
-    string smallestPalindrome(string s, int k) {
-        vector<int> freq(26, 0);
-        for (char c : s) freq[c - 'a']++;
+        int half = s.size() / 2;
 
-        char mid = 0;
-        vector<int> half(26);
-        int len = 0;
-        for (int i = 0; i < 26; i++) {
-            half[i] = freq[i] / 2;
-            len += half[i];
-            if (freq[i] % 2) mid = char('a' + i);
-        }
+        vector<int> cnt(26);
 
-        if (countWays(half) < k) return "";
+        // Only the left half determines the palindrome.
+        for (int i = 0; i < half; i++)
+            cnt[s[i] - 'a']++;
 
-        string left = "";
-        for (int pos = 0; pos < len; pos++) {
-            for (int ch = 0; ch < 26; ch++) {
-                if (half[ch] == 0) continue;
+        auto countWays = [&](int rem) {
 
-                half[ch]--;
-                long long ways = countWays(half);
+            long long ways = 1;
 
-                if (ways >= k) {
-                    left += char('a' + ch);
+            for (int i = 0; i < 26; i++) {
+
+                if (!cnt[i])
+                    continue;
+
+                ways *= comb(rem, cnt[i], k);
+
+                if (ways > k)
+                    return k + 1;
+
+                rem -= cnt[i];
+            }
+
+            return ways;
+        };
+
+        string left;
+
+        long long rank = 1;
+
+        for (int pos = 0; pos < half; pos++) {
+
+            for (int c = 0; c < 26; c++) {
+
+                if (!cnt[c])
+                    continue;
+
+                cnt[c]--;
+
+                long long ways = countWays(half - pos - 1);
+
+                if (rank + ways > k) {
+
+                    left += char('a' + c);
                     break;
                 }
-                k -= ways;
-                half[ch]++;
+
+                cnt[c]++;
+                rank += ways;
             }
         }
+
+        if ((int)left.size() != half)
+            return "";
+
+        string mid;
+
+        if (s.size() & 1)
+            mid += s[half];
 
         string right = left;
         reverse(right.begin(), right.end());
 
-        if (mid) return left + mid + right;
-        return left + right;
+        return left + mid + right;
     }
 };
