@@ -1,7 +1,15 @@
 class Solution {
 public:
-    int minimumPushes(string G ){
-        auto q = G.size() >> 3 , r = G.size() & 7;
-        return ((q << 2) + r) * (q + 1);
+    int minimumPushes(string word) {
+
+        int ans = 0;
+
+        for (int i = 0; i < word.size(); i++) {
+
+            // Every 8 letters require one extra push.
+            ans += i / 8 + 1;
+        }
+
+        return ans;
     }
 };
