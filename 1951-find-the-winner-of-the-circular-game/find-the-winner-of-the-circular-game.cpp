@@ -1,31 +1,23 @@
 class Solution {
 public:
+
+    // Returns winner using 0-based indexing
+    int josephus(int n, int k) {
+
+        // Base case:
+        // Only one player remains.
+        if (n == 1)
+            return 0;
+
+        // Solve smaller problem and
+        // convert answer to current circle.
+        return (josephus(n - 1, k) + k) % n;
+    }
+
     int findTheWinner(int n, int k) {
 
-        // Queue stores all players
-        queue<int> players;
-
-        // Initially every player is alive
-        for (int player = 1; player <= n; player++) {
-            players.push(player);
-        }
-
-        // Continue until only one player survives
-        while (players.size() > 1) {
-
-            // Rotate the first (k-1) players
-            // by moving them from front to back.
-            for (int count = 1; count < k; count++) {
-
-                players.push(players.front());
-                players.pop();
-            }
-
-            // The kth player is eliminated.
-            players.pop();
-        }
-
-        // Last remaining player is the winner.
-        return players.front();
+        // Convert 0-based answer
+        // into 1-based player number.
+        return josephus(n, k) + 1;
     }
 };
