@@ -1,28 +1,48 @@
 class Solution {
 public:
+    int n;
+
+    vector<int> suffix;
+    vector<vector<int>> dp;
+
+    int solve(int i, int M) {
+
+        // No piles left.
+        if (i >= n)
+            return 0;
+
+        // Can take everything.
+        if (i + 2 * M >= n)
+            return suffix[i];
+
+        if (dp[i][M] != -1)
+            return dp[i][M];
+
+        int best = 0;
+
+        // Try taking X piles.
+        for (int X = 1; X <= 2 * M; X++) {
+
+            best = max(
+                best,
+                suffix[i] - solve(i + X, max(M, X))
+            );
+        }
+
+        return dp[i][M] = best;
+    }
+
     int stoneGameII(vector<int>& piles) {
-        int n = piles.size();
 
-        vector<vector<int>> dp(n , vector<int>(n + 1 , 0));
-        vector<int> suffixSum(n ,0);
-        suffixSum[n - 1] = piles[n - 1];
+        n = piles.size();
 
-        for(int i = n  - 2 ; i >= 0 ; i--){
-            suffixSum[i] = suffixSum[i + 1] + piles[i];
-        }
+        suffix.assign(n + 1, 0);
 
-        for(int i = n - 1 ; i >= 0 ; i--){
-            for(int m = 1 ; m <=n ; m++){
-                if(i + 2 * m >= n){
-                    dp[i][m] = suffixSum[i];
-                }else {
-                            for(int x = 1 ; x <= 2 * m ; x++){
-                                dp[i][m] = max(dp[i][m] , suffixSum[i] - dp[i + x][max(m , x)]);
-                            }
-                        }
-                    }
-        }
+        for (int i = n - 1; i >= 0; i--)
+            suffix[i] = suffix[i + 1] + piles[i];
 
-        return dp[0][1];
+        dp.assign(n, vector<int>(n + 1, -1));
+
+        return solve(0, 1);
     }
 };
