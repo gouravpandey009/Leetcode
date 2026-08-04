@@ -1,22 +1,27 @@
 class Solution {
 public:
     vector<int> findMissingElements(vector<int>& nums) {
-        sort(nums.begin() , nums.end());
-        vector<int> ans;
-        int n = nums.size();
 
-        int start = nums[0];
-        int end = nums[n - 1];
+        int mn = INT_MAX;
+        int mx = INT_MIN;
 
-        unordered_map<int,int> mpp;
-        for(int i = 0 ; i < n ; i++){
-            mpp[nums[i]];
+        unordered_set<int> seen;
+
+        for (int x : nums) {
+
+            mn = min(mn, x);
+            mx = max(mx, x);
+
+            seen.insert(x);
         }
 
-        for(int i = start ; i <= end ; i++){
-            if(mpp.find(i) == mpp.end()){
-                ans.push_back(i);
-            }
+        vector<int> ans;
+
+        // Check every value inside the original range.
+        for (int x = mn + 1; x < mx; x++) {
+
+            if (!seen.count(x))
+                ans.push_back(x);
         }
 
         return ans;
