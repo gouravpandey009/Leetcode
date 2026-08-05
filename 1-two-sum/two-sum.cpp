@@ -6,7 +6,7 @@ public:
         unordered_map<int, int> valueToIndex;
 
         // Process each element exactly once.
-        for (int currentIndex = 0; currentIndex < static_cast<int>(nums.size()); ++currentIndex) {
+        for (int currentIndex = 0; currentIndex < (nums.size()); ++currentIndex) {
 
             // Current value under consideration.
             int currentValue = nums[currentIndex];
