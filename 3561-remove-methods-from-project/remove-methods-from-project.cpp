@@ -1,48 +1,58 @@
 class Solution {
 public:
 
+    void dfs(int u,
+             vector<vector<int>> &graph,
+             vector<int> &vis) {
 
-    void dfs(int node , unordered_map<int , vector<int>>& invoke , vector<int>& vis){
-        vis[node] = 1;
-        for(auto &it : invoke[node]){
-            if(!vis[it]){
-                dfs(it , invoke , vis);
-            }
+        vis[u] = 1;
+
+        for (int v : graph[u]) {
+
+            if (!vis[v])
+                dfs(v, graph, vis);
         }
     }
 
+    vector<int> remainingMethods(int n,
+                                 int k,
+                                 vector<vector<int>>& invocations) {
 
-    vector<int> remainingMethods(int n, int k, vector<vector<int>>& invocations) {
-        unordered_map<int ,vector<int>> invoke;
+        vector<vector<int>> graph(n);
 
-        for(auto &it : invocations){
-            int u = it[0];
-            int v = it[1];
-            invoke[u].push_back(v);
-        }
+        for (auto &e : invocations)
+            graph[e[0]].push_back(e[1]);
 
-        vector<int>vis(n ,0);
-        dfs(k , invoke , vis);
+        vector<int> suspicious(n, 0);
 
-        vector<int> rem;
+        // Mark every suspicious method.
+        dfs(k, graph, suspicious);
 
-        for(auto &it : invocations){
-            int u = it[0];
-            int v = it[1];
+        // Check whether a safe method invokes
+        // any suspicious method.
+        for (auto &e : invocations) {
 
-            if(!vis[u] && vis[v]){
-                for(int i = 0 ; i < n; i++)
-                    rem.push_back(i);
-                    return rem;
+            int u = e[0];
+            int v = e[1];
+
+            if (!suspicious[u] && suspicious[v]) {
+
+                vector<int> ans(n);
+
+                iota(ans.begin(), ans.end(), 0);
+
+                return ans;
             }
-
         }
 
-            for(int i = 0 ; i < n; i++){
-                if(!vis[i])
-                rem.push_back(i);
-            }
+        vector<int> ans;
 
-            return rem;
+        for (int i = 0; i < n; i++) {
+
+            if (!suspicious[i])
+                ans.push_back(i);
         }
+
+        return ans;
+    }
 };
