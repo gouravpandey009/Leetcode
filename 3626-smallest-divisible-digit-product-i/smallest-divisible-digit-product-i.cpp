@@ -1,12 +1,24 @@
 class Solution {
 public:
     int smallestNumber(int n, int t) {
-        auto [q , r] = div(n , 10);
 
-        int req = t / gcd(q + (10 - q) / 10 , t);
-        int nxt = ((r + req - 1) / req) *req;
-        int x = nxt - (nxt - 10) * (nxt / 10);
+        while (true) {
 
-        return q * 10 + x;
+            int x = n;
+            int prod = 1;
+
+            // Compute product of digits.
+            while (x) {
+                prod *= x % 10;
+                x /= 10;
+            }
+
+            if (prod % t == 0)
+                return n;
+
+            n++;
+        }
+
+        return -1;
     }
 };
