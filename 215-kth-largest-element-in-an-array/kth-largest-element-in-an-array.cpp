@@ -1,104 +1,159 @@
 class Solution {
 public:
 
-    // Performs 3-way partitioning around the pivot.
-    //
-    // After partitioning:
-    //
-    // [left ... low-1]      -> elements < pivot
-    // [low  ... high]       -> elements == pivot
-    // [high+1 ... right]    -> elements > pivot
-    //
-    // Returns the range [low, high] containing
-    // all elements equal to the pivot.
+    /*
+        3-Way Partition
+
+        After partitioning:
+
+        [left ... equalStart-1]
+            -> elements smaller than pivot
+
+        [equalStart ... equalEnd]
+            -> elements equal to pivot
+
+        [equalEnd+1 ... right]
+            -> elements greater than pivot
+    */
     pair<int, int> partition3Way(
         vector<int>& nums,
         int left,
         int right,
         int pivot
     ) {
+
+        // 'low' marks where the next element
+        // smaller than pivot should go.
         int low = left;
+
+        // 'mid' scans the unknown region.
         int mid = left;
+
+        // 'high' marks where the next element
+        // greater than pivot should go.
         int high = right;
 
         while (mid <= high) {
 
-            // Current element is smaller than pivot.
+            // ------------------------------------------------
+            // Case 1: Current element is smaller than pivot
+            // ------------------------------------------------
             if (nums[mid] < pivot) {
 
+                // Move the smaller element to the left region.
                 swap(nums[low], nums[mid]);
 
+                // Left region grows.
                 low++;
+
+                // The swapped element is processed,
+                // so move to the next unknown element.
                 mid++;
             }
 
-            // Current element is equal to pivot.
+            // ------------------------------------------------
+            // Case 2: Current element equals pivot
+            // ------------------------------------------------
             else if (nums[mid] == pivot) {
 
-                // It is already in the correct middle region.
+                // It already belongs to the middle region.
                 mid++;
             }
 
-            // Current element is greater than pivot.
+            // ------------------------------------------------
+            // Case 3: Current element is greater than pivot
+            // ------------------------------------------------
             else {
 
+                // Move the greater element to the right region.
                 swap(nums[mid], nums[high]);
 
+                // Right region grows.
                 high--;
 
+                // IMPORTANT:
                 // Do NOT increment mid.
-                // The newly swapped element still needs processing.
+                //
+                // The element that came from 'high'
+                // has not been processed yet.
             }
         }
 
-        // [low ... high] contains all elements equal to pivot.
+        // All elements from low to high are equal to pivot.
         return {low, high};
     }
 
 
     int findKthLargest(vector<int>& nums, int k) {
 
-        int left = 0;
-        int right = nums.size() - 1;
+        int n = nums.size();
 
         // Convert kth largest into its equivalent
         // index in ascending sorted order.
-        int targetIndex = nums.size() - k;
+        //
+        // Example:
+        //
+        // [1,2,3,4,5,6]
+        // 2nd largest = 5
+        //
+        // Index = n - k
+        //       = 6 - 2
+        //       = 4
+        int targetIndex = n - k;
+
+        // Current Quickselect search range.
+        int left = 0;
+        int right = n - 1;
 
         while (left <= right) {
 
-            // Choose a pivot from the current search space.
+            // Choose the middle element as the pivot.
             //
-            // Using the middle element gives us a better
-            // deterministic choice than always using right.
-            int middle = left + (right - left) / 2;
-            int pivot = nums[middle];
+            // This is better than always choosing
+            // the last element because it avoids
+            // one obvious source of bad partitions.
+            int pivotIndex = left + (right - left) / 2;
 
-            // Perform 3-way partitioning.
+            int pivot = nums[pivotIndex];
+
+            // Partition the current range into:
+            //
+            // < pivot
+            // == pivot
+            // > pivot
             auto [equalStart, equalEnd] =
                 partition3Way(nums, left, right, pivot);
 
-            // Target lies inside the region containing
-            // elements equal to the pivot.
+
+            // ------------------------------------------------
+            // Target lies inside the equal-to-pivot region.
+            // ------------------------------------------------
             if (targetIndex >= equalStart &&
                 targetIndex <= equalEnd) {
 
                 return nums[targetIndex];
             }
 
+
+            // ------------------------------------------------
             // Target lies in the smaller-than-pivot region.
+            // ------------------------------------------------
             if (targetIndex < equalStart) {
 
                 right = equalStart - 1;
             }
 
+            // ------------------------------------------------
             // Target lies in the greater-than-pivot region.
+            // ------------------------------------------------
             else {
 
                 left = equalEnd + 1;
             }
         }
 
+        // This line is theoretically unreachable because
+        // the problem guarantees a valid k.
         return -1;
     }
 };
