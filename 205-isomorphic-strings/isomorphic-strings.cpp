@@ -1,49 +1,38 @@
 class Solution {
 public:
     bool isIsomorphic(string s, string t) {
+        if(s.size() != t.size()){
+            return false;
+        }
 
-        // Store the mapping from characters of s to characters of t.
-        vector<pair<char, char>> mappings;
 
-        for (int i = 0; i < s.size(); i++) {
+        vector<pair<char , char>> mp;
 
-            char source = s[i];
-            char target = t[i];
+        for(int i = 0 ; i < s.size() ; i++){
+            char a = s[i];
+            char b = t[i];
 
-            bool sourceFound = false;
-            bool targetAlreadyUsed = false;
+            bool found = false;
+            
 
-            // Search whether source character already has a mapping.
-            for (auto mapping : mappings) {
+            for(int j = 0 ; j < mp.size() ; j++){
+                if (mp[j].first == a){
+                    found = true;
 
-                // Found the existing mapping for the source character.
-                if (mapping.first == source) {
-                    sourceFound = true;
 
-                    // If it maps to a different character,
-                    // the strings cannot be isomorphic.
-                    if (mapping.second != target) {
+
+                    if(mp[j].second != b){
                         return false;
                     }
                 }
 
-                // Check whether another source character is already
-                // mapped to this target character.
-                if (mapping.second == target &&
-                    mapping.first != source) {
-                    targetAlreadyUsed = true;
+                if(mp[j].second == b && mp[j].first != a){
+                    return false;
                 }
             }
 
-            // A new source character cannot map to a target character
-            // that is already assigned to another source character.
-            if (!sourceFound && targetAlreadyUsed) {
-                return false;
-            }
-
-            // Create a new mapping if this source character is new.
-            if (!sourceFound) {
-                mappings.push_back({source, target});
+            if(!found) {
+                 mp.push_back({ a , b});
             }
         }
 
