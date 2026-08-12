@@ -1,41 +1,37 @@
 class Solution {
 public:
     bool isIsomorphic(string s, string t) {
+
         if(s.size() != t.size()){
             return false;
         }
 
 
-        vector<pair<char , char>> mp;
+        vector<int> sToT(256  , -1);
+        vector<int> tToS(256 , -1);
 
         for(int i = 0 ; i < s.size() ; i++){
-            char a = s[i];
-            char b = t[i];
-
-            bool found = false;
-            
-
-            for(int j = 0 ; j < mp.size() ; j++){
-                if (mp[j].first == a){
-                    found = true;
+            int a  = s[i];
+            int b = t[i];
 
 
-
-                    if(mp[j].second != b){
-                        return false;
-                    }
-                }
-
-                if(mp[j].second == b && mp[j].first != a){
-                    return false;
-                }
+            if(sToT[a] != -1 && sToT[a] != b){
+                return false;
             }
 
-            if(!found) {
-                 mp.push_back({ a , b});
+            if(tToS[b] != -1 && tToS[b] != a){
+                return false;
             }
+
+            //store mapping in both directions
+
+            sToT[a] = b;
+            tToS[b] = a;
         }
 
+
         return true;
+
+        
     }
 };
