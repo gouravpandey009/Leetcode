@@ -4,8 +4,9 @@ class Solution {
         int pref = 0;
         int suff = 0;
         int best = 0;
-        char left = 0;
-        char right = 0;
+
+        char left = 0;  
+        char right = 0; 
     };
 
     vector<Node> tree;
@@ -16,21 +17,28 @@ class Solution {
         if (b.len == 0) return a;
 
         Node res;
+
         res.len = a.len + b.len;
 
+        // First and last character of merged segment
         res.left = a.left;
         res.right = b.right;
 
+        // Initially take prefix/suffix/best from children
         res.pref = a.pref;
         res.suff = b.suff;
         res.best = max(a.best, b.best);
 
+        // Can the suffix of left and prefix of right join?
         if (a.right == b.left) {
+            // Longest segment crossing the boundary
             res.best = max(res.best, a.suff + b.pref);
 
+            // Entire left segment is same character
             if (a.pref == a.len)
                 res.pref = a.len + b.pref;
 
+            // Entire right segment is same character
             if (b.suff == b.len)
                 res.suff = b.len + a.suff;
         }
@@ -70,7 +78,8 @@ class Solution {
     }
 
 public:
-    vector<int> longestRepeating(string s, string queryCharacters,
+    vector<int> longestRepeating(string s,
+                                 string queryCharacters,
                                  vector<int>& queryIndices) {
         this->s = s;
 
@@ -80,11 +89,16 @@ public:
         build(1, 0, n - 1);
 
         vector<int> ans;
+        ans.reserve(queryIndices.size());
 
         for (int i = 0; i < queryIndices.size(); ++i) {
-            update(1, 0, n - 1,
-                   queryIndices[i],
-                   queryCharacters[i]);
+            update(
+                1,
+                0,
+                n - 1,
+                queryIndices[i],
+                queryCharacters[i]
+            );
 
             ans.push_back(tree[1].best);
         }
