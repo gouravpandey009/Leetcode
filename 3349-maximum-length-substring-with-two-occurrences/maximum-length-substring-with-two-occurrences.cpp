@@ -1,18 +1,22 @@
 class Solution {
 public:
     int maximumLengthSubstring(string s) {
-        int res = 0;
-        int fq[26] = {0};
+        int freq[26] = {};
 
-        for(int l = 0 , r = 0 ; r < s.length() ; r++){
-            fq[(s[r] & 31) - 1]++;
+        int left = 0;
+        int ans = 0;
 
-            while(fq[(s[r] & 31) - 1] > 2)
-            fq[(s[l++] & 31) - 1]--;
+        for (int right = 0; right < s.size(); ++right) {
+            ++freq[s[right] - 'a'];
 
-            res = max(res , r - l + 1);
+            while (freq[s[right] - 'a'] > 2) {
+                --freq[s[left] - 'a'];
+                ++left;
+            }
+
+            ans = max(ans, right - left + 1);
         }
 
-        return res;
+        return ans;
     }
 };
