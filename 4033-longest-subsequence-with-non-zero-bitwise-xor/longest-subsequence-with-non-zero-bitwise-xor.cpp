@@ -1,15 +1,22 @@
 class Solution {
 public:
     int longestSubsequence(vector<int>& nums) {
-        int total = 0;
-        bool nonZero = 0;
+        int x = 0;
+        bool hasNonZero = false;
 
-        for(auto& n : nums){
-            nonZero |= n > 0;
-            total ^= n;
+        for (int num : nums) {
+            x ^= num;
+
+            if (num != 0)
+                hasNonZero = true;
         }
 
-        return nonZero * (nums.size() - (total == 0));
+        if (x != 0)
+            return nums.size();
 
+        if (hasNonZero)
+            return nums.size() - 1;
+
+        return 0;
     }
 };
