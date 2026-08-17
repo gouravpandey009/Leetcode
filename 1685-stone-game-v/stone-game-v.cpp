@@ -1,40 +1,61 @@
 class Solution {
-public:
-    int dp[501][501];
-    int rec(int low ,int high , vector<int>& pref){
-        if(high == low)return 0;
-        if(dp[low][high] != -1){
-            return dp[low][high];
-        }
+    vector<vector<int>> dp;
+    vector<int> prefix;
+    vector<int> a;
+
+    int solve(int l, int r) {
+        if (l >= r)
+            return 0;
+
+        if (dp[l][r] != -1)
+            return dp[l][r];
 
         int ans = 0;
-        for(int i = low ; i < high ; i++){
-            int left = pref[i + 1] - pref[low];
-            int right = pref[high + 1] - pref[i + 1];
-            if(left < right){
-                ans = max(ans , left + rec(low , i ,pref));
-            }
 
-            else if(left > right){
-                ans = max(ans , right + rec(i + 1 , high , pref));
-            }
+        int leftSum = 0;
+        int rightSum = prefix[r + 1] - prefix[l];
 
+        for (int k = l; k < r; ++k) {
+            leftSum += a[k];
+            rightSum -= a[k];
+
+            if (leftSum < rightSum) {
+                if (ans >= 2 * leftSum)
+                    continue;
+
+                ans = max(ans, leftSum + solve(l, k));
+            }
+            else if (leftSum > rightSum) {
+                if (ans >= 2 * rightSum)
+                    break;
+
+                ans = max(ans, rightSum + solve(k + 1, r));
+            }
             else {
-                ans = max(ans , max(left + rec(low , i , pref) ,right + rec(i + 1 , high ,pref)));
+                ans = max({
+                    ans,
+                    leftSum + solve(l, k),
+                    rightSum + solve(k + 1, r)
+                });
             }
         }
 
-        return dp[low][high] = ans;
+        return dp[l][r] = ans;
     }
 
-
+public:
     int stoneGameV(vector<int>& stoneValue) {
-        int n = stoneValue.size();
-        memset(dp , -1 ,sizeof(dp));
-        vector<int>pref(n + 1);
-        for(int i = 0 ; i < n ; i++){
-            pref[i + 1] = pref[i] + stoneValue[i];
-        }
-        return rec(0 ,n - 1, pref);
+        a = stoneValue;
+
+        int n = a.size();
+
+        prefix.resize(n + 1);
+
+        for (int i = 0; i < n; ++i)
+            prefix[i + 1] = prefix[i] + a[i];
+
+        dp.assign(n, vector<int>(n, -1));
+
+        return solve(0, n - 1);
     }
 };
