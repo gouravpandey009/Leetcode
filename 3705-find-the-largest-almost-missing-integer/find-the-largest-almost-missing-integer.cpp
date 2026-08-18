@@ -1,40 +1,25 @@
 class Solution {
 public:
     int largestInteger(vector<int>& nums, int k) {
-        int n = nums.size();
-        unordered_map<int , int>mp;
-        for(int i = 0 ; i < n ; i++){
-            ++mp[nums[i]];
+        unordered_map<int, int> count;
+
+        for (int i = 0; i + k <= nums.size(); ++i) {
+            unordered_set<int> seen;
+
+            for (int j = i; j < i + k; ++j)
+                seen.insert(nums[j]);
+
+            for (int x : seen)
+                ++count[x];
         }
 
-        if(k == nums.size()){
-            return *max_element(nums.begin() , nums.end());
+        int ans = -1;
+
+        for (auto [x, cnt] : count) {
+            if (cnt == 1)
+                ans = max(ans, x);
         }
 
-        if(k == 1){
-            int max = -1;
-            for(int i = 0 ; i < n ; i++){
-            if(mp[nums[i]] == 1 && nums[i] > max){
-                max = nums[i];
-            }
-        }
-
-        return max;
-    }
-
-    n = n - 1;
-    if(mp[nums[0]] == 1 && mp[nums[n]] == 1){
-        return max(nums[0] , nums[n]);
-    }
-
-    if(mp[nums[0]] == 1 && mp[nums[n]] > 1){
-        return nums[0];
-    }
-
-    if(mp[nums[n]] == 1 && mp[nums[0]] > 1){
-        return nums[n];
-    }
-
-    return -1;
+        return ans;
     }
 };
