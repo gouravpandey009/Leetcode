@@ -1,30 +1,28 @@
 class Solution {
 public:
-    bool sumGame(string s) {
-        double res = 0;
-        double n = s.length();
-        for(int i = 0 ; i < n ; i++){
-            double sign;
-            if(i < n / 2){
-                sign = 1;
-            } else {
-                sign = -1;
-            }
+    bool sumGame(string num) {
+        int n = num.size();
 
-            double value;
-            if(s[i] == '?'){
-                value = 4.5;
-            } else{
-                value = s[i] - '0';
-            }
+        int q1 = 0, q2 = 0;
+        int s1 = 0, s2 = 0;
 
-            res += sign * value;
+        for (int i = 0; i < n / 2; ++i) {
+            if (num[i] == '?')
+                ++q1;
+            else
+                s1 += num[i] - '0';
         }
 
-        if(res != 0.0){
+        for (int i = n / 2; i < n; ++i) {
+            if (num[i] == '?')
+                ++q2;
+            else
+                s2 += num[i] - '0';
+        }
+
+        if ((q1 + q2) & 1)
             return true;
-        } else {
-            return false;
-        }
+
+        return 2 * (s1 - s2) != 9 * (q2 - q1);
     }
 };
