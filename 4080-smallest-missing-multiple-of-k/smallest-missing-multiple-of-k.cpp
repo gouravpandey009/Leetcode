@@ -1,13 +1,13 @@
 class Solution {
 public:
     int missingMultiple(vector<int>& nums, int k) {
-        unordered_set<int> seen(nums.begin(), nums.end());
+        unordered_set<int> st(nums.begin(), nums.end());
 
-        int cur = k;
-        while(seen.count(cur)){
-            cur += k;
+        for (int i = 1; ; ++i) {
+            int x = k * i;
+
+            if (!st.count(x))
+                return x;
         }
-
-        return cur;
     }
 };
