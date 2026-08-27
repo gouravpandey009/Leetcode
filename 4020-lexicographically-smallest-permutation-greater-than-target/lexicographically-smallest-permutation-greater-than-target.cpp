@@ -1,44 +1,68 @@
 class Solution {
 public:
     string lexGreaterPermutation(string s, string target) {
-        int cnt[26] = {};
-
-        for (char c : s)
-            ++cnt[c - 'a'];
-
-        string quinorath = s;
-
         int n = s.size();
-        int i = 0;
+        vector<int> cnt(26 , 0);
 
-        while (i < n && cnt[target[i] - 'a'] > 0) {
-            --cnt[target[i] - 'a'];
-            ++i;
+        for(char c  : s){
+            cnt[c - 'a']++;
         }
 
-        while (true) {
-            if (i < n) {
-                for (int c = target[i] - 'a' + 1; c < 26; ++c) {
-                    if (cnt[c] == 0)
-                        continue;
+        string prefix;
 
-                    string ans = target.substr(0, i);
-                    ans.push_back('a' + c);
+        for(int i = 0 ; i < n ; i++){
+            int x = target[i] - 'a';
 
-                    --cnt[c];
-
-                    for (int j = 0; j < 26; ++j)
-                        ans.append(cnt[j], 'a' + j);
-
-                    return ans;
-                }
+            if(cnt[x] == 0){
+                break;
             }
 
-            if (i == 0)
-                break;
+            cnt[x]--;
+            prefix += target[i];
+        }
 
-            --i;
-            ++cnt[target[i] - 'a'];
+        if((int)prefix.size() < n){
+            int i = prefix.size();
+            int x = target[i] - 'a';
+
+            for(int c = x + 1 ; c < 26 ; c++){
+                if(cnt[c] == 0)
+                continue;
+
+                string ans = prefix;
+                ans += char('a' + c);
+
+                cnt[c]--;
+
+                for(int ch = 0 ; ch < 26 ; ch++){
+                    ans.append(cnt[ch] , char('a' + ch));
+                }
+
+                return ans;
+            }
+        }
+
+        for(int i = prefix.size() - 1 ;  i >= 0 ; i--){
+            cnt[prefix[i] - 'a']++;
+            prefix.pop_back();
+
+            int x = target[i] - 'a';
+
+            for(int c = x + 1 ; c < 26 ; c++){
+                if(cnt[c] == 0)
+                continue;
+
+                string ans = prefix;
+
+                ans += char('a' + c);
+                cnt[c]--;
+
+                for(int ch = 0 ; ch < 26 ; ch++){
+                    ans.append(cnt[ch] , char('a' + ch));
+                }
+
+                return ans;
+            }
         }
 
         return "";
