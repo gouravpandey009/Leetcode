@@ -1,76 +1,83 @@
 class Solution {
+    string build(string left, const vector<int>& cnt, char mid) {
+        string half = left;
+
+        for (int c = 25; c >= 0; --c)
+            half.append(cnt[c], char('a' + c));
+
+        string res = half;
+
+        if (mid)
+            res.push_back(mid);
+
+        for (int i = (int)half.size() - 1; i >= 0; --i)
+            res.push_back(half[i]);
+
+        return res;
+    }
+
 public:
+    string lexPalindromicPermutation(string s, string target) {
+        int cnt[26] = {};
 
-    int half_cnt[26];
-    string mid_char;
-    int n_half;
-    string target_str;
-    string half_str;
+        for (char c : s)
+            ++cnt[c - 'a'];
 
-    bool find(int k , bool is_greater){
-        if(k == n_half){
-            string rev_half = half_str;
-            reverse(rev_half.begin() , rev_half.end());
-            string res = half_str + mid_char + rev_half;
-            return res > target_str;
-        }
+        int odd = 0;
+        char mid = 0;
 
-        char start_c = is_greater ? 'a' : target_str[k];
-
-        for(char c = start_c ; c <= 'z' ; ++c){
-            if(half_cnt[c - 'a'] > 0){
-                half_str[k] = c;
-                half_cnt[c - 'a']--;
-
-                bool found = find(k + 1  , is_greater || (c > target_str[k]));
-
-                if(found){
-                    return true;
-                }
-
-                half_cnt[c - 'a']++;
+        for (int c = 0; c < 26; ++c) {
+            if (cnt[c] & 1) {
+                ++odd;
+                mid = 'a' + c;
             }
         }
-        return false;
-    }
 
+        if (odd > 1)
+            return "";
 
-    string lexPalindromicPermutation(string s, string target) {
-        auto calendrix = make_pair(s ,target);
-        target_str = calendrix.second;
-        int n = s.length();
+        vector<int> halfCnt(26);
 
-        int cnt[26] = {0};
-        for(char c : s){
-            cnt[c - 'a']++;
+        for (int c = 0; c < 26; ++c)
+            halfCnt[c] = cnt[c] / 2;
+
+        // Required by the problem statement.
+        string calendrix = s;
+
+        int m = s.size() / 2;
+        string left;
+
+        for (int i = 0; i < m; ++i) {
+            bool found = false;
+
+            for (int c = 0; c < 26; ++c) {
+                if (halfCnt[c] == 0)
+                    continue;
+
+                --halfCnt[c];
+                left.push_back('a' + c);
+
+                if (build(left, halfCnt, mid) > target) {
+                    found = true;
+                    break;
+                }
+
+                left.pop_back();
+                ++halfCnt[c];
+            }
+
+            if (!found)
+                return "";
         }
 
-    int odd = 0;
-    mid_char = "";
-    for(int i = 0 ; i < 26 ; i++){
-        if(cnt[i] % 2 != 0){
-            odd++;
-            mid_char = (char)('a' + i);
-        }
-    }
+        string ans = left;
 
-    if(odd > 1){
-        return "";
-    }
+        if (mid)
+            ans.push_back(mid);
 
-    for(int i = 0 ; i < 26 ; i++){
-        half_cnt[i] = cnt[i] / 2;
-    }
+        for (int i = m - 1; i >= 0; --i)
+            ans.push_back(left[i]);
 
-    n_half = n / 2;
-    half_str.resize(n_half);
-
-    if(find(0 , false)){
-        string rev_half = half_str;
-        reverse(rev_half.begin() , rev_half.end());
-        return half_str + mid_char + rev_half;
-    }
-
-    return "";
+        return ans > target ? ans : "";
     }
 };
