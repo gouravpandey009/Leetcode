@@ -1,90 +1,104 @@
-using ll = long long;
-
-
 class Solution {
 public:
     int minMoves(vector<string>& classroom, int energy) {
-        ll m = classroom.size();
-        ll n = classroom[0].size();
+        int m = classroom.size();
+        int n = classroom[0].size();
 
+        vector<pair<int, int>> litter;
+        int sr = 0, sc = 0;
 
-        ll sX = 0 , sY = 0;
-        ll lcount = 0;
-        ll fnlMask = 0;
-
-        ll id[21][21] = {0};
-
-        for(int i = 0 ; i < m ; i++){
-            for(int j = 0 ; j < n ; j++){
-                if(classroom[i][j] == 'S'){
-                    sX = i;
-                    sY = j;
-                } else if (classroom[i][j] == 'L'){
-                    fnlMask |= (1LL << lcount);
-                    id[i][j] = lcount;
-                    lcount++;
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (classroom[i][j] == 'S') {
+                    sr = i;
+                    sc = j;
+                } 
+                else if (classroom[i][j] == 'L') {
+                    litter.push_back({i, j});
                 }
             }
         }
 
-        vector<vector<vector<vector<int>>>> state(m , vector<vector<vector<int>>>(
-            n , vector<vector<int>>(
-                energy + 1 , vector<int>(1 << lcount , -1)
-            )
-        )
-        );
+        int k = litter.size();
 
-        queue<tuple<ll, ll, ll, ll>> q;
+        if (k == 0)
+            return 0;
 
-        state[sX][sY][energy][0] = 0;
-        q.push({sX, sY, energy, 0});
+        vector<vector<int>> id(m, vector<int>(n, -1));
 
-        int dx[] = {1, -1, 0, 0};
-        int dy[] = {0, 0, 1, -1};
+        for (int i = 0; i < k; ++i) {
+            auto [r, c] = litter[i];
+            id[r][c] = i;
+        }
+
+        int totalMask = 1 << k;
+        int cells = m * n;
+
+        // best[mask * cells + pos] = maximum energy seen
+        vector<int> best(totalMask * cells, -1);
+
+        struct State {
+            int r, c, mask, e;
+        };
+
+        queue<State> q;
+
+        int startPos = sr * n + sc;
+        best[startPos] = energy;
+
+        q.push({sr, sc, 0, energy});
+
+        int moves = 0;
+
+        int dr[4] = {-1, 1, 0, 0};
+        int dc[4] = {0, 0, -1, 1};
 
         while (!q.empty()) {
-            auto [x, y, e, mask] = q.front();
-            q.pop();
+            int sz = q.size();
 
-            int moves = state[x][y][e][mask];
+            while (sz--) {
+                auto [r, c, mask, e] = q.front();
+                q.pop();
 
-            if (mask == fnlMask) {
-                return moves;
-            }
-
-            for (int dir = 0; dir < 4; dir++) {
-                ll nx = x + dx[dir];
-                ll ny = y + dy[dir];
-
-                if (nx < 0 || nx >= m || ny < 0 || ny >= n)
-                    continue;
-
-                if (classroom[nx][ny] == 'X')
-                    continue;
+                if (mask == totalMask - 1)
+                    return moves;
 
                 if (e == 0)
                     continue;
 
-                ll ne = e - 1;
-                ll nmask = mask;
+                for (int d = 0; d < 4; ++d) {
+                    int nr = r + dr[d];
+                    int nc = c + dc[d];
 
-                if (classroom[nx][ny] == 'L') {
-                    nmask |= (1LL << id[nx][ny]);
+                    if (nr < 0 || nr >= m || nc < 0 || nc >= n)
+                        continue;
+
+                    if (classroom[nr][nc] == 'X')
+                        continue;
+
+                    int ne = e - 1;
+                    int nmask = mask;
+
+                    if (classroom[nr][nc] == 'R')
+                        ne = energy;
+
+                    if (id[nr][nc] != -1)
+                        nmask |= (1 << id[nr][nc]);
+
+                    int pos = nr * n + nc;
+                    int idx = nmask * cells + pos;
+
+                    if (best[idx] >= ne)
+                        continue;
+
+                    best[idx] = ne;
+                    q.push({nr, nc, nmask, ne});
                 }
-
-                if (classroom[nx][ny] == 'R') {
-                    ne = energy;
-                }
-
-                if (state[nx][ny][ne][nmask] != -1)
-                    continue;
-
-                state[nx][ny][ne][nmask] = moves + 1;
-                q.push({nx, ny, ne, nmask});
             }
+
+            ++moves;
         }
 
         return -1;
     }
-
 };
