@@ -1,12 +1,22 @@
 class Solution {
 public:
     bool uniformArray(vector<int>& nums1) {
-        int xmin = 1e9 , cntOdd = 0;
-        for(int x: nums1){
-            cntOdd += x &1;
-            xmin = min(xmin , x);
+        int mnOdd = INT_MAX;
+
+        for (int x : nums1) {
+            if (x & 1)
+                mnOdd = min(mnOdd, x);
         }
 
-        return xmin&1 || cntOdd == 0;
+        // No odd numbers -> all numbers are even already
+        if (mnOdd == INT_MAX)
+            return true;
+
+        for (int x : nums1) {
+            if ((x & 1) == 0 && x < mnOdd)
+                return false;
+        }
+
+        return true;
     }
 };
