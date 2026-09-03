@@ -7,8 +7,6 @@ public:
             if (x & 1)
                 mnOdd = min(mnOdd, x);
         }
-
-        // No odd numbers -> all numbers are even already
         if (mnOdd == INT_MAX)
             return true;
 
