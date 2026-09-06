@@ -1,33 +1,23 @@
-#include <vector>
-using namespace std;
-
 class Solution {
 public:
     double findMaxAverage(vector<int>& nums, int k) {
+        int sum = 0;
 
-        // Build the first window
-        int windowSum = 0;
-
+        // Find sum of the first k elements.
         for (int i = 0; i < k; i++) {
-            windowSum += nums[i];
+            sum += nums[i];
         }
 
-        int maxSum = windowSum;
+        int maxSum = sum;
 
-        // Slide the window
+        // Slide the window through the array.
         for (int i = k; i < nums.size(); i++) {
+            sum -= nums[i - k];  // Remove old element.
+            sum += nums[i];      // Add new element.
 
-            // Remove the element leaving the window
-            windowSum -= nums[i - k];
-
-            // Add the new element entering the window
-            windowSum += nums[i];
-
-            // Update maximum sum
-            maxSum = max(maxSum, windowSum);
+            maxSum = max(maxSum, sum);
         }
 
-        // Average = sum / number of elements
         return (double)maxSum / k;
     }
 };
