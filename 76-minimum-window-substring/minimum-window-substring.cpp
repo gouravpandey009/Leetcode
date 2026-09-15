@@ -2,8 +2,8 @@ class Solution {
 public:
     string minWindow(string s, string t) {
 
-        int need[128] = {};
-        int have[128] = {};
+        int need[126] = {};
+        int have[126] = {};
 
         // t mein har character kitni baar chahiye.
         for (char c : t)
