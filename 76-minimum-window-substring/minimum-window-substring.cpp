@@ -2,52 +2,56 @@ class Solution {
 public:
     string minWindow(string s, string t) {
 
-        int need[126] = {};
-        int have[126] = {};
+        int need[128] = {};
+        int have[128] = {};
 
-        // t mein har character kitni baar chahiye.
-        for (char c : t)
+        for(char c : t)
             need[c]++;
 
-        int left = 0;
-        int count = 0;
+            int left = 0;
+            int count = 0;
 
-        int start = 0;
-        int len = s.size() + 1;
+            int start = 0;
 
-        for (int right = 0; right < s.size(); right++) {
+            int len = s.size() + 1; // INT_MAX
 
-            // Current character window mein add karo.
-            char c = s[right];
-            have[c]++;
+            for(int right = 0 ; right < s.size(); right++) {
+                //curr char window add
 
-            // Is character ki required frequency complete hui.
-            if (have[c] <= need[c])
+                char c = s[right];
+                have[c]++;
+
+                if(have[c] <= need[c])
                 count++;
 
-            // Window valid hai, ab chhota karo.
-            while (count == t.size()) {
+                //find min window
 
-                if (right - left + 1 < len) {
-                    len = right - left + 1;
-                    start = left;
-                }
+                while(count == t.size()){
 
-                // Left character window se remove karo.
-                char c = s[left];
-                have[c]--;
+                    if(right - left + 1 < len){
+                        len = right - left + 1;
 
-                // Required character ki frequency toot gayi.
-                if (have[c] < need[c])
+                        start = left;
+
+
+                    }
+
+                    //left char window remove
+
+                    char c = s[left];
+                    have[c]--;
+
+                    if(have[c] < need[c])
                     count--;
+                    left++;
 
-                left++;
+                }
             }
-        }
 
-        if (len == s.size() + 1)
+            if(len == s.size() + 1)
             return "";
 
-        return s.substr(start, len);
-    }
+            return s.substr(start , len);
+        }
+        
 };
