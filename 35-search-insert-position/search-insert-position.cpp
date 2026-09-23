@@ -2,17 +2,25 @@ class Solution {
 public:
     int searchInsert(vector<int>& nums, int target) {
 
-        // Traverse every element one by one
-        for (int i = 0; i < nums.size(); i++) {
+        int left = 0;
+        int right = nums.size() - 1;
 
-            // First element greater than or equal to target
-            // is the required position.
-            if (nums[i] >= target)
-                return i;
+        while(left <= right){
+            //middle postion
+            int mid = left + (right - left) / 2;
+
+            //target right side
+
+            if(nums[mid] < target){
+                left = mid + 1;
+            }
+
+            else{
+                right = mid - 1;
+            }
         }
 
-        // Target is greater than every element,
-        // so insert at the end.
-        return nums.size();
+        return left;
+        
     }
 };
