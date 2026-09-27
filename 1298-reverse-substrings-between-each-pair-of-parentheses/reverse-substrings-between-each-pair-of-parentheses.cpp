@@ -1,18 +1,30 @@
 class Solution {
 public:
     string reverseParentheses(string s) {
-        stack<int> lastskiplength;
-        string result;
+        int n = s.length();
 
-        for(char &ch : s){
-            if(ch == '('){
-                lastskiplength.push(result.length());
-            } else if(ch == ')'){
-                int l = lastskiplength.top();
-                lastskiplength.pop();
-                reverse(begin(result) + l , end(result));
-            } else{
-                result.push_back(ch);
+        stack<int> openBracketIdx;
+        vector<int> door(n);
+
+        for(int i = 0 ; i < n ; i++){
+            if(s[i] == '('){
+                 openBracketIdx.push(i);
+            } else if(s[i] == ')'){
+                int j =  openBracketIdx.top();
+                 openBracketIdx.pop();
+                 door[i] = j;
+                 door[j] = i;
+            }
+        }
+
+        string result;
+        int flag = 1;
+        for(int i = 0 ; i < n ; i += flag){
+            if(s[i] == '(' || s[i] == ')'){
+                i = door[i];
+                flag = -flag; //for changing direction
+            } else {
+                result.push_back(s[i]);
             }
         }
 
