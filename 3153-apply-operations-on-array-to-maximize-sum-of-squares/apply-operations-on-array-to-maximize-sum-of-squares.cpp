@@ -1,22 +1,33 @@
 class Solution {
 public:
-        int maxSum(vector<int>& A, int k) {
-        vector<int> count(32);
-        for (int a : A)
-            for (int i = 0; i < 32; i++)
-                if (a & (1 << i))
-                    count[i]++;
-        int res = 0, mod = 1e9 + 7;
-        for (int j = 0; j < k; j++) {
-            int cur = 0;
-            for (int i = 0; i < 32; i++) {
-                if (count[i] > 0) {
-                    count[i]--;
-                    cur += 1 << i;
-                }
+    int maxSum(vector<int>& nums, int k) {
+        int b[30] = {0};
+        long long ans = 0 , mod = 1000000007;
+
+        for(int x : nums){
+        for (int i = 0 ; i < 30 ; i++){
+            if(x & (1 << i)){
+
+            b[i]++;
             }
-            res = (res + 1L * cur * cur % mod) % mod;
+            }
         }
-        return res;
+
+
+        while(k-- > 0) {
+            long long x = 0;
+            for(int i = 0 ; i < 30 ; i++){
+                if(b[i] > 0){
+                    x |= (1LL << i);
+                    b[i]--;
+                }
+
+            }
+
+            ans = (ans + x * x) % mod;
+            
+        }
+
+        return (int)ans;
     }
 };
