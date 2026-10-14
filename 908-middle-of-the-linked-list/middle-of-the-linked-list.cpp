@@ -12,32 +12,15 @@ class Solution {
 public:
     ListNode* middleNode(ListNode* head) {
 
-        //brute force
+        ListNode* slow = head;
+        ListNode* fast = head;
 
-        int count = 0;
-        ListNode* curr = head;
-
-        //total nodes
-
-        while(curr != NULL){
-            count++;
-            curr = curr -> next;
+        while(fast != NULL && fast-> next != NULL){
+            slow = slow -> next;
+            fast = fast -> next -> next;
         }
 
-        //middle value
-
-        int mid = count / 2;
-        curr = head;
-
-        //find middle node
-
-        while(mid > 0){
-            curr = curr -> next;
-            mid--;
-        }
-
-        return curr;
-
+        return slow;
         
     }
 };
