@@ -12,28 +12,40 @@ class Solution {
 public:
     bool isPalindrome(ListNode* head) {
 
-        vector<int> arr;
+        //mid find
 
-        ListNode* curr = head;
+        ListNode* slow = head;
+        ListNode* fast = head;
 
-        while(curr != NULL){
-            arr.push_back(curr -> val);
-            curr = curr -> next;
+        while(fast != NULL && fast -> next != NULL){
+            slow = slow -> next;
+            fast = fast -> next -> next;
         }
 
+        //second half reverse
 
-        //array compare from both ends
+        ListNode* prev = NULL;
+        ListNode* curr = slow;
 
-        int left = 0;
-        int right = arr.size() - 1;
+        while(curr != NULL){
+            ListNode* next = curr -> next;
+            curr-> next = prev;
+            prev = curr;
+            curr = next;
+        }
 
-        while(left < right){
-            if(arr[left] != arr[right]){
+        //both halves compare
+
+        ListNode* first = head;
+        ListNode* second = prev;
+
+        while(second != NULL){
+            if(first -> val != second -> val){
                 return false;
             }
 
-            left++;
-            right--;
+            first = first -> next;
+            second = second -> next;
         }
 
         return true;
