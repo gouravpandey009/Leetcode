@@ -1,27 +1,41 @@
-#include <stack>
-#include <unordered_map>
-
 class Solution {
 public:
     bool isValid(string s) {
-        std::stack<char> stack;
-        std::unordered_map<char, char> brackets = {
-            {')', '('},
-            {'}', '{'},
-            {']', '['}
-        };
-        
-        for (char ch : s) {
-            if (brackets.count(ch)) {
-                if (stack.empty() || stack.top() != brackets[ch]) {
+
+        stack<char>st;
+
+        for(char ch : s){
+            //if opening bracket we have to push into the stack
+
+            if(ch == '(' || ch == '{' || ch == '['){
+                st.push(ch);
+            }
+
+            //closing bracket
+
+            else{
+                if(st.empty()){
                     return false;
                 }
-                stack.pop();
-            } else {
-                stack.push(ch);
+
+                if(ch == ')' && st.top() != '('){
+                    return false;
+                }
+
+                if(ch == '}' && st.top()!= '{'){
+                    return false;
+                }
+
+                if(ch == ']' && st.top()!= '['){
+                    return false;
+
+                }
+
+                st.pop();
             }
+
+            
         }
-        
-        return stack.empty();
+        return st.empty();
     }
 };
